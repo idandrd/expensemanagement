@@ -22,17 +22,25 @@ raw_data = unicode(f.read().decode('1255'))
 
 data = [row.split('\t') for row in raw_data.split('\n')]
 
+csv_headers = data[2]
+csv_body = data[4:-2]
+
 expenses = [dict(zip(data[2], row)) for row in data[4:-2]]
 
 next_row = len(cells) + 1
 
+cells_for_dups = [row[:3] for row in cells]
+
 for expense in expenses:
-	for v, k in expense.iteritems():
-		if column_translation.has_key(v):
-			expenses_ws.update_cell(next_row, column_translation[v.strip()], k)
-        		if (column_translation[v.strip()] == 1) and not providers.has_key(k):
-                		provider_ws.update_cell(len(providers)+2, 1, k)
-                		providers[k] = len(providers) + 2
+	new_expense = {}
+	for k, v in expense.iteritems():
+		if column_translation.has_key(k):
+			new_expense[column_translation[k]] = v
+	if not [new_expense[1],new_expense[2],new_expense[3]] in cells_for_dups:
+		for k,v in new_expense.iteritems:
+			expenses_ws.update_cell(next_row, k, v)
+        		if (k == 1) and not providers.has_key(v):
+                		provider_ws.update_cell(len(providers)+2, 1, v)
+                		providers[v] = len(providers) + 2
 
 	next_row = next_row + 1
-
